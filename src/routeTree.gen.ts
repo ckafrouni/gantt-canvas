@@ -9,6 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as GanttSidebarRightRouteImport } from './routes/gantt-sidebar-right'
+import { Route as GanttMinimalRouteImport } from './routes/gantt-minimal'
+import { Route as GanttBottomToolbarRouteImport } from './routes/gantt-bottom-toolbar'
 import { Route as GanttRouteImport } from './routes/gantt'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
@@ -21,6 +24,21 @@ import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
 
+const GanttSidebarRightRoute = GanttSidebarRightRouteImport.update({
+  id: '/gantt-sidebar-right',
+  path: '/gantt-sidebar-right',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GanttMinimalRoute = GanttMinimalRouteImport.update({
+  id: '/gantt-minimal',
+  path: '/gantt-minimal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GanttBottomToolbarRoute = GanttBottomToolbarRouteImport.update({
+  id: '/gantt-bottom-toolbar',
+  path: '/gantt-bottom-toolbar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GanttRoute = GanttRouteImport.update({
   id: '/gantt',
   path: '/gantt',
@@ -80,6 +98,9 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/gantt': typeof GanttRoute
+  '/gantt-bottom-toolbar': typeof GanttBottomToolbarRoute
+  '/gantt-minimal': typeof GanttMinimalRoute
+  '/gantt-sidebar-right': typeof GanttSidebarRightRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -93,6 +114,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/gantt': typeof GanttRoute
+  '/gantt-bottom-toolbar': typeof GanttBottomToolbarRoute
+  '/gantt-minimal': typeof GanttMinimalRoute
+  '/gantt-sidebar-right': typeof GanttSidebarRightRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -107,6 +131,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/gantt': typeof GanttRoute
+  '/gantt-bottom-toolbar': typeof GanttBottomToolbarRoute
+  '/gantt-minimal': typeof GanttMinimalRoute
+  '/gantt-sidebar-right': typeof GanttSidebarRightRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -122,6 +149,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/gantt'
+    | '/gantt-bottom-toolbar'
+    | '/gantt-minimal'
+    | '/gantt-sidebar-right'
     | '/demo/tanstack-query'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -135,6 +165,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/gantt'
+    | '/gantt-bottom-toolbar'
+    | '/gantt-minimal'
+    | '/gantt-sidebar-right'
     | '/demo/tanstack-query'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -148,6 +181,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/gantt'
+    | '/gantt-bottom-toolbar'
+    | '/gantt-minimal'
+    | '/gantt-sidebar-right'
     | '/demo/tanstack-query'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -162,6 +198,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GanttRoute: typeof GanttRoute
+  GanttBottomToolbarRoute: typeof GanttBottomToolbarRoute
+  GanttMinimalRoute: typeof GanttMinimalRoute
+  GanttSidebarRightRoute: typeof GanttSidebarRightRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
@@ -175,6 +214,27 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/gantt-sidebar-right': {
+      id: '/gantt-sidebar-right'
+      path: '/gantt-sidebar-right'
+      fullPath: '/gantt-sidebar-right'
+      preLoaderRoute: typeof GanttSidebarRightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gantt-minimal': {
+      id: '/gantt-minimal'
+      path: '/gantt-minimal'
+      fullPath: '/gantt-minimal'
+      preLoaderRoute: typeof GanttMinimalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gantt-bottom-toolbar': {
+      id: '/gantt-bottom-toolbar'
+      path: '/gantt-bottom-toolbar'
+      fullPath: '/gantt-bottom-toolbar'
+      preLoaderRoute: typeof GanttBottomToolbarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gantt': {
       id: '/gantt'
       path: '/gantt'
@@ -258,6 +318,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GanttRoute: GanttRoute,
+  GanttBottomToolbarRoute: GanttBottomToolbarRoute,
+  GanttMinimalRoute: GanttMinimalRoute,
+  GanttSidebarRightRoute: GanttSidebarRightRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,

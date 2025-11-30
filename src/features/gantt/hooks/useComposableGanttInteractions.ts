@@ -1,7 +1,11 @@
 import { useCallback, useRef, useEffect } from "react";
 import type { TaskId, HitZone, DragType } from "../types";
-import { useGanttUIStore } from "../store/ui-store";
-import { useGanttDataStore } from "../store/data-store";
+import {
+  useGanttSelection,
+  useGanttDrag,
+  useGanttTasks,
+  useGanttActions,
+} from "../context/gantt-context";
 import { getIndexManager } from "../indexes/index-manager";
 import type { ViewportManager } from "../engine/viewport-manager";
 
@@ -19,9 +23,10 @@ interface InteractionState {
 }
 
 /**
- * Hook for handling all Gantt chart interactions
+ * Hook for handling all Gantt chart interactions.
+ * Uses the composable context instead of global stores.
  */
-export function useGanttInteractions(
+export function useComposableGanttInteractions(
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
   viewportManager: ViewportManager | null,
 ) {
@@ -35,20 +40,25 @@ export function useGanttInteractions(
     isDragging: false,
   });
 
-  const selection = useGanttUIStore((s) => s.selection);
-  const drag = useGanttUIStore((s) => s.drag);
+  const selection = useGanttSelection();
+  const drag = useGanttDrag();
+  const tasks = useGanttTasks();
 
-  const selectTask = useGanttUIStore((s) => s.selectTask);
-  const clearSelection = useGanttUIStore((s) => s.clearSelection);
-  const setHoveredTask = useGanttUIStore((s) => s.setHoveredTask);
-  const startDrag = useGanttUIStore((s) => s.startDrag);
-  const updateDrag = useGanttUIStore((s) => s.updateDrag);
-  const commitDrag = useGanttUIStore((s) => s.commitDrag);
-  const cancelDrag = useGanttUIStore((s) => s.cancelDrag);
-  const panViewport = useGanttUIStore((s) => s.panViewport);
-  const zoomViewport = useGanttUIStore((s) => s.zoomViewport);
-
-  const tasks = useGanttDataStore((s) => s.tasks);
+  const {
+    selectTask,
+    clearSelection,
+    selectAllTasks,
+    setHoveredTask,
+    startDrag,
+    updateDrag,
+    commitDrag,
+    cancelDrag,
+    panViewport,
+    zoomViewport,
+    deleteTask,
+    undo,
+    redo,
+  } = useGanttActions();
 
   /**
    * Detect which task and zone is under the cursor
@@ -203,15 +213,7 @@ export function useGanttInteractions(
         updateCursor(zone, false);
       }
     },
-    [
-      hitTest,
-      drag,
-      startDrag,
-      updateDrag,
-      panViewport,
-      setHoveredTask,
-      updateCursor,
-    ],
+    [hitTest, drag, startDrag, updateDrag, panViewport, setHoveredTask, updateCursor],
   );
 
   /**
@@ -301,7 +303,6 @@ export function useGanttInteractions(
 
       // Delete - delete selected tasks
       if (e.key === "Delete" || e.key === "Backspace") {
-        const deleteTask = useGanttDataStore.getState().deleteTask;
         for (const taskId of selection.taskIds) {
           deleteTask(taskId);
         }
@@ -311,13 +312,13 @@ export function useGanttInteractions(
       // Ctrl+A - select all
       if ((e.ctrlKey || e.metaKey) && e.key === "a") {
         e.preventDefault();
-        useGanttUIStore.getState().selectAllTasks();
+        selectAllTasks();
       }
 
       // Ctrl+Z - undo
       if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
         e.preventDefault();
-        useGanttDataStore.temporal.getState().undo();
+        undo();
       }
 
       // Ctrl+Shift+Z or Ctrl+Y - redo
@@ -326,10 +327,10 @@ export function useGanttInteractions(
         ((e.ctrlKey || e.metaKey) && e.key === "y")
       ) {
         e.preventDefault();
-        useGanttDataStore.temporal.getState().redo();
+        redo();
       }
     },
-    [drag, selection, cancelDrag, clearSelection],
+    [drag, selection, cancelDrag, clearSelection, deleteTask, selectAllTasks, undo, redo],
   );
 
   // Attach event listeners
@@ -350,14 +351,7 @@ export function useGanttInteractions(
       window.removeEventListener("mouseup", handleMouseUp);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    canvasRef,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleWheel,
-    handleKeyDown,
-  ]);
+  }, [canvasRef, handleMouseDown, handleMouseMove, handleMouseUp, handleWheel, handleKeyDown]);
 
   return {
     hitTest,

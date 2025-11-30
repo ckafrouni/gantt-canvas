@@ -1,27 +1,58 @@
 import { ChevronRight, User, Cpu } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
-import type { VirtualRow } from "../types";
-import { useGanttUIStore } from "../store/ui-store";
-import { useGanttDataStore } from "../store/data-store";
+import type { VirtualRow } from "../../types";
+import {
+  useGanttViewport,
+  useGanttResources,
+  useGanttActions,
+} from "../../context/gantt-context";
+import { useComposableVirtualRows } from "../../hooks/useComposableVirtualRows";
 
-interface GanttSidebarProps {
-  virtualRows: VirtualRow[];
-  width: number;
-  height: number;
+export interface GanttSidebarProps {
+  /** Width of the sidebar */
+  width?: number;
+  /** Height of the sidebar (if not set, uses flex-1) */
+  height?: number;
+  /** Position of the sidebar */
+  position?: "left" | "right";
+  /** Enable resize handle */
+  resizable?: boolean;
+  /** Enable collapse button */
+  collapsible?: boolean;
+  /** Additional class name */
+  className?: string;
+  /** Virtual rows (optional - uses internal calculation if not provided) */
+  virtualRows?: VirtualRow[];
 }
 
+/**
+ * Sidebar component showing resource list with grouping support.
+ * Can be positioned on either side and optionally resized.
+ */
 export function GanttSidebar({
-  virtualRows,
-  width,
+  width: propWidth,
   height,
+  position = "left",
+  resizable = false,
+  collapsible = false,
+  className = "",
+  virtualRows: externalVirtualRows,
 }: GanttSidebarProps) {
-  const scrollY = useGanttUIStore((s) => s.viewport.scrollY);
-  const toggleGroup = useGanttUIStore((s) => s.toggleGroup);
-  const resources = useGanttDataStore((s) => s.resources);
+  const viewport = useGanttViewport();
+  const resources = useGanttResources();
+  const { toggleGroup, setSidebarWidth } = useGanttActions();
+
+  // Use external virtual rows if provided, otherwise compute internally
+  const internalVirtualRows = useComposableVirtualRows();
+  const virtualRows = externalVirtualRows ?? internalVirtualRows;
+
+  const sidebarWidth = (propWidth ?? viewport.width > 0) ? 200 : 200;
+  const scrollY = viewport.scrollY;
 
   // Track previous row IDs to detect new rows for animation
   const prevRowIdsRef = useRef<Set<string>>(new Set());
   const [newRowIds, setNewRowIds] = useState<Set<string>>(new Set());
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     const currentIds = new Set(virtualRows.map((r) => r.id));
@@ -31,7 +62,6 @@ export function GanttSidebar({
     const newIds = new Set<string>();
     for (const id of currentIds) {
       if (!prevIds.has(id)) {
-        // Check if it's a resource row (not a header) - only animate those
         const row = virtualRows.find((r) => r.id === id);
         if (row && !row.isGroupHeader) {
           newIds.add(id);
@@ -41,7 +71,6 @@ export function GanttSidebar({
 
     if (newIds.size > 0) {
       setNewRowIds(newIds);
-      // Clear the "new" state after animation completes
       const timeout = setTimeout(() => {
         setNewRowIds(new Set());
       }, 300);
@@ -58,11 +87,41 @@ export function GanttSidebar({
         virtualRows[virtualRows.length - 1].height
       : 0;
 
+  const borderClass = position === "left" ? "border-r" : "border-l";
+
+  if (isCollapsed && collapsible) {
+    return (
+      <button
+        type="button"
+        className={`flex items-center justify-center bg-slate-900 ${borderClass} border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors ${className}`}
+        style={{ width: 32, height }}
+        onClick={() => setIsCollapsed(false)}
+      >
+        <ChevronRight
+          className={`w-4 h-4 text-slate-400 ${position === "right" ? "rotate-180" : ""}`}
+        />
+      </button>
+    );
+  }
+
   return (
     <div
-      className="relative bg-slate-900 border-r border-slate-700 overflow-hidden"
-      style={{ width, height }}
+      className={`relative bg-slate-900 ${borderClass} border-slate-700 overflow-hidden ${className}`}
+      style={{ width: sidebarWidth, height }}
     >
+      {/* Collapse button */}
+      {collapsible && (
+        <button
+          type="button"
+          className={`absolute top-2 ${position === "left" ? "right-2" : "left-2"} p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300 z-10`}
+          onClick={() => setIsCollapsed(true)}
+        >
+          <ChevronRight
+            className={`w-3 h-3 ${position === "left" ? "rotate-180" : ""}`}
+          />
+        </button>
+      )}
+
       {/* Scrollable content */}
       <div
         className="absolute left-0 right-0"
@@ -84,7 +143,6 @@ export function GanttSidebar({
 
           const resource = row.resourceId ? resources[row.resourceId] : null;
           const isNew = newRowIds.has(row.id);
-          // Calculate stagger delay based on position within group
           const staggerIndex = index;
 
           return (
@@ -99,6 +157,14 @@ export function GanttSidebar({
           );
         })}
       </div>
+
+      {/* Resize handle */}
+      {resizable && (
+        <ResizeHandle
+          position={position}
+          onResize={(delta) => setSidebarWidth(sidebarWidth + delta)}
+        />
+      )}
     </div>
   );
 }
@@ -162,7 +228,6 @@ function ResourceRow({
 
   useEffect(() => {
     if (isNew) {
-      // Trigger animation on next frame
       const raf = requestAnimationFrame(() => {
         setMounted(true);
       });
@@ -170,7 +235,6 @@ function ResourceRow({
     }
   }, [isNew]);
 
-  // Stagger delay (max 150ms total stagger)
   const staggerDelay = Math.min(staggerIndex * 20, 150);
 
   return (
@@ -187,5 +251,43 @@ function ResourceRow({
       <Icon className="w-4 h-4 text-slate-500 mr-2 shrink-0" />
       <span className="text-sm text-slate-300 truncate">{resourceName}</span>
     </div>
+  );
+}
+
+interface ResizeHandleProps {
+  position: "left" | "right";
+  onResize: (delta: number) => void;
+}
+
+function ResizeHandle({ position, onResize }: ResizeHandleProps) {
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const delta =
+        position === "left"
+          ? moveEvent.clientX - startX
+          : startX - moveEvent.clientX;
+      onResize(delta);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: resize handle requires mouse interaction
+    <div
+      className={`absolute top-0 bottom-0 w-1 cursor-ew-resize hover:bg-cyan-500/50 transition-colors ${
+        position === "left" ? "right-0" : "left-0"
+      }`}
+      onMouseDown={handleMouseDown}
+    />
   );
 }

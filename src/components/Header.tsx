@@ -10,6 +10,11 @@ import {
   SquareFunction,
   StickyNote,
   X,
+  Calendar,
+  LayoutGrid,
+  ArrowDown,
+  PanelRight,
+  Minimize2,
 } from "lucide-react";
 
 export default function Header() {
@@ -184,6 +189,99 @@ export default function Header() {
             <Network size={20} />
             <span className="font-medium">TanStack Query</span>
           </Link>
+
+          {/* Gantt Chart Demos */}
+          <div className="mt-4 mb-2 px-3">
+            <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">
+              Gantt Chart Demos
+            </span>
+          </div>
+
+          <Link
+            to="/gantt"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+            activeProps={{
+              className:
+                "flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2",
+            }}
+          >
+            <Calendar size={20} />
+            <span className="font-medium">Original Gantt</span>
+          </Link>
+
+          <div className="flex flex-row justify-between">
+            <Link
+              to="/gantt-bottom-toolbar"
+              onClick={() => setIsOpen(false)}
+              className="flex-1 flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+              activeProps={{
+                className:
+                  "flex-1 flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2",
+              }}
+            >
+              <LayoutGrid size={20} />
+              <span className="font-medium">Composable Layouts</span>
+            </Link>
+            <button
+              type="button"
+              className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              onClick={() =>
+                setGroupedExpanded((prev) => ({
+                  ...prev,
+                  GanttLayouts: !prev.GanttLayouts,
+                }))
+              }
+            >
+              {groupedExpanded.GanttLayouts ? (
+                <ChevronDown size={20} />
+              ) : (
+                <ChevronRight size={20} />
+              )}
+            </button>
+          </div>
+          {groupedExpanded.GanttLayouts && (
+            <div className="flex flex-col ml-4">
+              <Link
+                to="/gantt-bottom-toolbar"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+                activeProps={{
+                  className:
+                    "flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2",
+                }}
+              >
+                <ArrowDown size={20} />
+                <span className="font-medium">Bottom Toolbar</span>
+              </Link>
+
+              <Link
+                to="/gantt-sidebar-right"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+                activeProps={{
+                  className:
+                    "flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2",
+                }}
+              >
+                <PanelRight size={20} />
+                <span className="font-medium">Right Sidebar</span>
+              </Link>
+
+              <Link
+                to="/gantt-minimal"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+                activeProps={{
+                  className:
+                    "flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2",
+                }}
+              >
+                <Minimize2 size={20} />
+                <span className="font-medium">Minimal Canvas</span>
+              </Link>
+            </div>
+          )}
 
           {/* Demo Links End */}
         </nav>

@@ -1,148 +1,145 @@
-import {
-	ZoomIn,
-	ZoomOut,
-	Undo,
-	Redo,
-	Layers,
-	ChevronDown,
-	Calendar,
-} from "lucide-react";
+import { ZoomIn, ZoomOut, Undo, Redo, Layers, Calendar } from "lucide-react";
 import type { ZoomLevel, GroupingMode } from "../types";
-import { useGanttUIStore, ZOOM_CONFIGS } from "../store/ui-store";
+import { useGanttUIStore } from "../store/ui-store";
 import { useGanttDataStore } from "../store/data-store";
 
 interface GanttToolbarProps {
-	onScrollToToday?: () => void;
+  onScrollToToday?: () => void;
 }
 
 export function GanttToolbar({ onScrollToToday }: GanttToolbarProps) {
-	const zoomLevel = useGanttUIStore((s) => s.viewport.zoomLevel);
-	const setZoomLevel = useGanttUIStore((s) => s.setZoomLevel);
-	const zoomViewport = useGanttUIStore((s) => s.zoomViewport);
-	const groupingMode = useGanttUIStore((s) => s.grouping.mode);
-	const setGroupingMode = useGanttUIStore((s) => s.setGroupingMode);
-	const viewport = useGanttUIStore((s) => s.viewport);
-	const scrollToTime = useGanttUIStore((s) => s.scrollToTime);
+  const zoomLevel = useGanttUIStore((s) => s.viewport.zoomLevel);
+  const setZoomLevel = useGanttUIStore((s) => s.setZoomLevel);
+  const zoomViewport = useGanttUIStore((s) => s.zoomViewport);
+  const groupingMode = useGanttUIStore((s) => s.grouping.mode);
+  const setGroupingMode = useGanttUIStore((s) => s.setGroupingMode);
+  const viewport = useGanttUIStore((s) => s.viewport);
+  const scrollToTime = useGanttUIStore((s) => s.scrollToTime);
 
-	const handleZoomIn = () => {
-		zoomViewport(1.25, viewport.width / 2);
-	};
+  const handleZoomIn = () => {
+    zoomViewport(1.25, viewport.width / 2);
+  };
 
-	const handleZoomOut = () => {
-		zoomViewport(0.8, viewport.width / 2);
-	};
+  const handleZoomOut = () => {
+    zoomViewport(0.8, viewport.width / 2);
+  };
 
-	const handleUndo = () => {
-		useGanttDataStore.temporal.getState().undo();
-	};
+  const handleUndo = () => {
+    useGanttDataStore.temporal.getState().undo();
+  };
 
-	const handleRedo = () => {
-		useGanttDataStore.temporal.getState().redo();
-	};
+  const handleRedo = () => {
+    useGanttDataStore.temporal.getState().redo();
+  };
 
-	const handleScrollToToday = () => {
-		scrollToTime(Date.now());
-		onScrollToToday?.();
-	};
+  const handleScrollToToday = () => {
+    scrollToTime(Date.now());
+    onScrollToToday?.();
+  };
 
-	const zoomLevels: { value: ZoomLevel; label: string }[] = [
-		{ value: "hour", label: "Hour" },
-		{ value: "day", label: "Day" },
-		{ value: "week", label: "Week" },
-		{ value: "month", label: "Month" },
-	];
+  const zoomLevels: { value: ZoomLevel; label: string }[] = [
+    { value: "hour", label: "Hour" },
+    { value: "day", label: "Day" },
+    { value: "week", label: "Week" },
+    { value: "month", label: "Month" },
+  ];
 
-	const groupingModes: { value: GroupingMode; label: string }[] = [
-		{ value: "none", label: "No Grouping" },
-		{ value: "resource_type", label: "By Type" },
-		{ value: "order", label: "By Order" },
-	];
+  const groupingModes: { value: GroupingMode; label: string }[] = [
+    { value: "none", label: "No Grouping" },
+    { value: "resource_type", label: "By Type" },
+    { value: "order", label: "By Order" },
+  ];
 
-	return (
-		<div className="flex items-center gap-2 px-4 py-2 bg-slate-800 border-b border-slate-700">
-			{/* Zoom controls */}
-			<div className="flex items-center gap-1">
-				<button
-					onClick={handleZoomOut}
-					className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-					title="Zoom out"
-				>
-					<ZoomOut className="w-4 h-4" />
-				</button>
+  return (
+    <div className="flex items-center gap-2 px-4 py-2 bg-slate-800 border-b border-slate-700">
+      {/* Zoom controls */}
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={handleZoomOut}
+          className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+          title="Zoom out"
+        >
+          <ZoomOut className="w-4 h-4" />
+        </button>
 
-				<select
-					value={zoomLevel}
-					onChange={(e) => setZoomLevel(e.target.value as ZoomLevel)}
-					className="px-2 py-1 text-sm bg-slate-700 border border-slate-600 rounded text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500"
-				>
-					{zoomLevels.map((level) => (
-						<option key={level.value} value={level.value}>
-							{level.label}
-						</option>
-					))}
-				</select>
+        <select
+          value={zoomLevel}
+          onChange={(e) => setZoomLevel(e.target.value as ZoomLevel)}
+          className="px-2 py-1 text-sm bg-slate-700 border border-slate-600 rounded text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+        >
+          {zoomLevels.map((level) => (
+            <option key={level.value} value={level.value}>
+              {level.label}
+            </option>
+          ))}
+        </select>
 
-				<button
-					onClick={handleZoomIn}
-					className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-					title="Zoom in"
-				>
-					<ZoomIn className="w-4 h-4" />
-				</button>
-			</div>
+        <button
+          type="button"
+          onClick={handleZoomIn}
+          className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+          title="Zoom in"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
+      </div>
 
-			{/* Divider */}
-			<div className="w-px h-6 bg-slate-600" />
+      {/* Divider */}
+      <div className="w-px h-6 bg-slate-600" />
 
-			{/* Today button */}
-			<button
-				onClick={handleScrollToToday}
-				className="flex items-center gap-1.5 px-2 py-1 text-sm rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-				title="Scroll to today"
-			>
-				<Calendar className="w-4 h-4" />
-				<span>Today</span>
-			</button>
+      {/* Today button */}
+      <button
+        type="button"
+        onClick={handleScrollToToday}
+        className="flex items-center gap-1.5 px-2 py-1 text-sm rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+        title="Scroll to today"
+      >
+        <Calendar className="w-4 h-4" />
+        <span>Today</span>
+      </button>
 
-			{/* Divider */}
-			<div className="w-px h-6 bg-slate-600" />
+      {/* Divider */}
+      <div className="w-px h-6 bg-slate-600" />
 
-			{/* Grouping */}
-			<div className="flex items-center gap-1.5">
-				<Layers className="w-4 h-4 text-slate-500" />
-				<select
-					value={groupingMode}
-					onChange={(e) => setGroupingMode(e.target.value as GroupingMode)}
-					className="px-2 py-1 text-sm bg-slate-700 border border-slate-600 rounded text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500"
-				>
-					{groupingModes.map((mode) => (
-						<option key={mode.value} value={mode.value}>
-							{mode.label}
-						</option>
-					))}
-				</select>
-			</div>
+      {/* Grouping */}
+      <div className="flex items-center gap-1.5">
+        <Layers className="w-4 h-4 text-slate-500" />
+        <select
+          value={groupingMode}
+          onChange={(e) => setGroupingMode(e.target.value as GroupingMode)}
+          className="px-2 py-1 text-sm bg-slate-700 border border-slate-600 rounded text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+        >
+          {groupingModes.map((mode) => (
+            <option key={mode.value} value={mode.value}>
+              {mode.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
-			{/* Spacer */}
-			<div className="flex-1" />
+      {/* Spacer */}
+      <div className="flex-1" />
 
-			{/* Undo/Redo */}
-			<div className="flex items-center gap-1">
-				<button
-					onClick={handleUndo}
-					className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-					title="Undo (Ctrl+Z)"
-				>
-					<Undo className="w-4 h-4" />
-				</button>
-				<button
-					onClick={handleRedo}
-					className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
-					title="Redo (Ctrl+Shift+Z)"
-				>
-					<Redo className="w-4 h-4" />
-				</button>
-			</div>
-		</div>
-	);
+      {/* Undo/Redo */}
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={handleUndo}
+          className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+          title="Undo (Ctrl+Z)"
+        >
+          <Undo className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={handleRedo}
+          className="p-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+          title="Redo (Ctrl+Shift+Z)"
+        >
+          <Redo className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
 }

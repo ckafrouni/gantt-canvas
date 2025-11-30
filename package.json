@@ -20,12 +20,18 @@
     "@tanstack/react-router-devtools": "^1.132.0",
     "@tanstack/react-router-ssr-query": "^1.131.7",
     "@tanstack/react-start": "^1.132.0",
+    "@tanstack/react-table": "^8.21.3",
     "@tanstack/router-plugin": "^1.132.0",
+    "date-fns": "^4.1.0",
+    "immer": "^11.0.1",
     "lucide-react": "^0.544.0",
+    "rbush": "^4.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.0.6",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "zundo": "^2.3.0",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
@@ -33,6 +39,7 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/node": "^22.10.2",
+    "@types/rbush": "^4.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",

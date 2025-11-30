@@ -1,4 +1,5 @@
-import { ChevronRight, ChevronDown, User, Cpu } from "lucide-react";
+import { ChevronRight, User, Cpu } from "lucide-react";
+import { useRef, useEffect, useState } from "react";
 import type { VirtualRow } from "../types";
 import { useGanttUIStore } from "../store/ui-store";
 import { useGanttDataStore } from "../store/data-store";
@@ -17,6 +18,38 @@ export function GanttSidebar({
   const scrollY = useGanttUIStore((s) => s.viewport.scrollY);
   const toggleGroup = useGanttUIStore((s) => s.toggleGroup);
   const resources = useGanttDataStore((s) => s.resources);
+
+  // Track previous row IDs to detect new rows for animation
+  const prevRowIdsRef = useRef<Set<string>>(new Set());
+  const [newRowIds, setNewRowIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const currentIds = new Set(virtualRows.map((r) => r.id));
+    const prevIds = prevRowIdsRef.current;
+
+    // Find newly added rows (for expand animation)
+    const newIds = new Set<string>();
+    for (const id of currentIds) {
+      if (!prevIds.has(id)) {
+        // Check if it's a resource row (not a header) - only animate those
+        const row = virtualRows.find((r) => r.id === id);
+        if (row && !row.isGroupHeader) {
+          newIds.add(id);
+        }
+      }
+    }
+
+    if (newIds.size > 0) {
+      setNewRowIds(newIds);
+      // Clear the "new" state after animation completes
+      const timeout = setTimeout(() => {
+        setNewRowIds(new Set());
+      }, 300);
+      return () => clearTimeout(timeout);
+    }
+
+    prevRowIdsRef.current = currentIds;
+  }, [virtualRows]);
 
   // Calculate total content height
   const totalHeight =
@@ -38,7 +71,7 @@ export function GanttSidebar({
           height: totalHeight,
         }}
       >
-        {virtualRows.map((row) => {
+        {virtualRows.map((row, index) => {
           if (row.isGroupHeader) {
             return (
               <GroupHeaderRow
@@ -50,6 +83,9 @@ export function GanttSidebar({
           }
 
           const resource = row.resourceId ? resources[row.resourceId] : null;
+          const isNew = newRowIds.has(row.id);
+          // Calculate stagger delay based on position within group
+          const staggerIndex = index;
 
           return (
             <ResourceRow
@@ -57,6 +93,8 @@ export function GanttSidebar({
               row={row}
               resourceName={resource?.name ?? "Unknown"}
               resourceType={resource?.type ?? "generic"}
+              isNew={isNew}
+              staggerIndex={staggerIndex}
             />
           );
         })}
@@ -81,7 +119,7 @@ function GroupHeaderRow({ row, onClick }: GroupHeaderRowProps) {
   return (
     <button
       type="button"
-      className="absolute left-0 right-0 flex items-center px-2 bg-slate-800 border-b border-slate-700 cursor-pointer hover:bg-slate-700 transition-colors text-left"
+      className="absolute left-0 right-0 flex items-center px-2 bg-slate-800 border-b border-slate-700 cursor-pointer hover:bg-slate-700 transition-all duration-200 text-left"
       style={{
         top: row.virtualY,
         height: row.height,
@@ -89,11 +127,14 @@ function GroupHeaderRow({ row, onClick }: GroupHeaderRowProps) {
       onClick={onClick}
       onKeyDown={handleKeyDown}
     >
-      {row.isCollapsed ? (
+      <span
+        className="transition-transform duration-200"
+        style={{
+          transform: row.isCollapsed ? "rotate(0deg)" : "rotate(90deg)",
+        }}
+      >
         <ChevronRight className="w-4 h-4 text-slate-400 mr-1" />
-      ) : (
-        <ChevronDown className="w-4 h-4 text-slate-400 mr-1" />
-      )}
+      </span>
       <span className="text-sm font-medium text-slate-200 truncate">
         {row.groupName}
       </span>
@@ -105,17 +146,42 @@ interface ResourceRowProps {
   row: VirtualRow;
   resourceName: string;
   resourceType: string;
+  isNew?: boolean;
+  staggerIndex?: number;
 }
 
-function ResourceRow({ row, resourceName, resourceType }: ResourceRowProps) {
+function ResourceRow({
+  row,
+  resourceName,
+  resourceType,
+  isNew = false,
+  staggerIndex = 0,
+}: ResourceRowProps) {
   const Icon = resourceType === "operator" ? User : Cpu;
+  const [mounted, setMounted] = useState(!isNew);
+
+  useEffect(() => {
+    if (isNew) {
+      // Trigger animation on next frame
+      const raf = requestAnimationFrame(() => {
+        setMounted(true);
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isNew]);
+
+  // Stagger delay (max 150ms total stagger)
+  const staggerDelay = Math.min(staggerIndex * 20, 150);
 
   return (
     <div
-      className="absolute left-0 right-0 flex items-center px-3 border-b border-slate-800 hover:bg-slate-800/50 transition-colors"
+      className="absolute left-0 right-0 flex items-center px-3 border-b border-slate-800 hover:bg-slate-800/50 transition-all duration-200"
       style={{
         top: row.virtualY,
         height: row.height,
+        opacity: mounted ? 1 : 0,
+        transform: mounted ? "translateX(0)" : "translateX(-10px)",
+        transitionDelay: isNew ? `${staggerDelay}ms` : "0ms",
       }}
     >
       <Icon className="w-4 h-4 text-slate-500 mr-2 flex-shrink-0" />

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+import { enableMapSet } from "immer";
 import type {
   TaskId,
   ViewportState,
@@ -11,6 +12,9 @@ import type {
   Task,
 } from "../types";
 import { useGanttDataStore } from "./data-store";
+
+// Enable Immer's MapSet plugin for Set/Map support
+enableMapSet();
 
 /** UI store state */
 export interface GanttUIState {

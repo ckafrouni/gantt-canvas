@@ -1,4 +1,4 @@
-import type { Task, TaskPhase, StoredTask } from "../types";
+import type { StoredTask, Task, TaskPhase } from "../types";
 
 /** Calculate total duration from phases in minutes */
 export function calculateTotalDuration(phases: TaskPhase[]): number {
@@ -25,9 +25,7 @@ export function hydrateTask(task: StoredTask): Task {
 }
 
 /** Get phase boundaries for rendering */
-export function getPhaseRanges(
-	task: Task,
-): Array<{
+export function getPhaseRanges(task: Task): Array<{
 	type: TaskPhase["type"];
 	start: number;
 	end: number;

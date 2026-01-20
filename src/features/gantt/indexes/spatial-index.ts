@@ -1,5 +1,5 @@
 import RBush from "rbush";
-import type { TaskId, TaskBounds, Task, VirtualRow } from "../types";
+import type { Task, TaskBounds, TaskId, VirtualRow } from "../types";
 
 /** RBush item type */
 interface RBushItem {
@@ -86,12 +86,7 @@ export class SpatialIndex {
 	/**
 	 * Query for tasks in a rectangular area (selection box)
 	 */
-	queryRect(
-		minX: number,
-		minY: number,
-		maxX: number,
-		maxY: number,
-	): TaskId[] {
+	queryRect(minX: number, minY: number, maxX: number, maxY: number): TaskId[] {
 		const results = this.tree.search({ minX, minY, maxX, maxY });
 		return results.map((r) => r.taskId);
 	}

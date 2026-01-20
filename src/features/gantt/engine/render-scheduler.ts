@@ -99,7 +99,12 @@ export class RenderScheduler {
 		this.dirtyLayers.clear();
 
 		// Render layers in order: grid -> tasks -> dependencies -> interaction
-		const order: RenderLayer[] = ["grid", "tasks", "dependencies", "interaction"];
+		const order: RenderLayer[] = [
+			"grid",
+			"tasks",
+			"dependencies",
+			"interaction",
+		];
 
 		for (const layer of order) {
 			if (layers.includes(layer)) {

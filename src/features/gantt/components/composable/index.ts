@@ -1,24 +1,22 @@
 // Composable Gantt components
-export { GanttCanvas } from "./GanttCanvas";
-export type { GanttCanvasProps } from "./GanttCanvas";
-
-export { GanttTimeline } from "./GanttTimeline";
-export type { GanttTimelineProps } from "./GanttTimeline";
-
-export { GanttSidebar } from "./GanttSidebar";
-export type { GanttSidebarProps } from "./GanttSidebar";
-
-export { GanttToolbar } from "./GanttToolbar";
-export type { GanttToolbarProps } from "./GanttToolbar";
 
 // Individual controls
 export {
-  ZoomControls,
-  ZoomButtons,
-  ZoomSelect,
-  UndoRedo,
-  UndoButton,
-  RedoButton,
-  GroupingSelect,
-  TodayButton,
+	GroupingSelect,
+	RedoButton,
+	TodayButton,
+	UndoButton,
+	UndoRedo,
+	ZoomButtons,
+	ZoomControls,
+	ZoomSelect,
 } from "./controls";
+export type { GanttCanvasProps } from "./GanttCanvas";
+export { GanttCanvas } from "./GanttCanvas";
+export type { GanttSidebarProps } from "./GanttSidebar";
+
+export { GanttSidebar } from "./GanttSidebar";
+export type { GanttTimelineProps } from "./GanttTimeline";
+export { GanttTimeline } from "./GanttTimeline";
+export type { GanttToolbarProps } from "./GanttToolbar";
+export { GanttToolbar } from "./GanttToolbar";

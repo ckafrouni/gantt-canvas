@@ -1,6 +1,12 @@
-import type { Task, TaskDependency, ViewportState, VirtualRow, TaskId } from "../types";
-import { clearCanvas, drawOrthogonalArrow } from "../utils/canvas-utils";
 import { getIndexManager } from "../indexes/index-manager";
+import type {
+	Task,
+	TaskDependency,
+	TaskId,
+	ViewportState,
+	VirtualRow,
+} from "../types";
+import { clearCanvas, drawOrthogonalArrow } from "../utils/canvas-utils";
 
 /** Dependency rendering constants */
 const ARROW_COLOR = "#94a3b8"; // slate-400
@@ -20,7 +26,11 @@ export class DependencyRenderer {
 	/**
 	 * Set the canvas context
 	 */
-	setContext(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+	setContext(
+		ctx: CanvasRenderingContext2D,
+		width: number,
+		height: number,
+	): void {
 		this.ctx = ctx;
 		this.width = width;
 		this.height = height;
@@ -79,7 +89,9 @@ export class DependencyRenderer {
 			if (!predVisible && !succVisible) return false;
 
 			// Check if either task's resource is visible
-			const predResourceVisible = visibleResourceIds.has(predecessor.resourceId);
+			const predResourceVisible = visibleResourceIds.has(
+				predecessor.resourceId,
+			);
 			const succResourceVisible = visibleResourceIds.has(successor.resourceId);
 
 			return predResourceVisible || succResourceVisible;

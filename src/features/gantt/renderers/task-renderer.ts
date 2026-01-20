@@ -139,7 +139,7 @@ export class TaskRenderer {
 			width >= MIN_TASK_WIDTH_FOR_PHASES && task.phases.length > 1;
 
 		if (showPhases) {
-			this.renderTaskWithPhases(ctx, task, x, taskY, width, taskHeight, COLORS);
+			this.renderTaskWithPhases(ctx, task, x, taskY, width, taskHeight);
 		} else {
 			this.renderSimpleTask(ctx, task, x, taskY, width, taskHeight, COLORS);
 		}
@@ -219,7 +219,6 @@ export class TaskRenderer {
 		y: number,
 		totalWidth: number,
 		height: number,
-		COLORS: ReturnType<typeof getTaskColors>,
 	): void {
 		const phases = getPhaseRanges(task);
 		const taskDuration = task._endTime - task.startTime;

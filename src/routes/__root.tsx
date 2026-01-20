@@ -45,6 +45,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		<html lang="en">
 			<head>
 				<HeadContent />
+				{import.meta.env.DEV && (
+					<script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+				)}
 			</head>
 			<body>
 				<ThemeProvider>

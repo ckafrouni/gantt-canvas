@@ -8,6 +8,7 @@ import {
   useGanttTasks,
   useGanttDependencies,
   useGanttActions,
+  useGanttMinResolution,
 } from "../../context/gantt-context";
 import { getIndexManager } from "../../indexes/index-manager";
 import {
@@ -69,6 +70,7 @@ export function GanttCanvas({
   const hoveredTaskId = useGanttHoveredTaskId();
   const tasks = useGanttTasks();
   const dependencies = useGanttDependencies();
+  const minResolution = useGanttMinResolution();
   const { setViewport } = useGanttActions();
 
   // Use external virtual rows if provided, otherwise compute internally
@@ -173,7 +175,7 @@ export function GanttCanvas({
 
     if (layers.includes("interaction")) {
       scheduler.registerRenderer("interaction", () => {
-        getInteractionRenderer().render(viewport, drag, null, tasks);
+        getInteractionRenderer().render(viewport, drag, null, tasks, minResolution);
       });
     }
 
@@ -186,7 +188,7 @@ export function GanttCanvas({
       if (layers.includes("dependencies")) scheduler.unregisterRenderer("dependencies");
       if (layers.includes("interaction")) scheduler.unregisterRenderer("interaction");
     };
-  }, [viewport, visibleRows, tasks, dependencies, selection, hoveredTaskId, drag, layers]);
+  }, [viewport, visibleRows, tasks, dependencies, selection, hoveredTaskId, drag, layers, minResolution]);
 
   // Initialize interactions
   useComposableGanttInteractions(interactionCanvasRef, viewportManagerRef.current);

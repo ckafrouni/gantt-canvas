@@ -78,6 +78,7 @@ export {
   useGanttDrag,
   useGanttHoveredTaskId,
   useGanttSidebarWidth,
+  useGanttMinResolution,
   useGanttCanUndo,
   useGanttCanRedo,
   useGanttActions,
@@ -92,7 +93,12 @@ export {
 } from "./hooks/useComposableVirtualRows";
 
 // Store factory (for advanced use)
-export { createGanttStore, ZOOM_CONFIGS } from "./context/gantt-store-factory";
+export {
+  createGanttStore,
+  ZOOM_CONFIGS,
+  DEFAULT_MIN_RESOLUTION,
+  getSnapIntervalMs,
+} from "./context/gantt-store-factory";
 export type {
   GanttStore,
   GanttStoreState,

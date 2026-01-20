@@ -61,17 +61,17 @@ function GanttSidebarRight() {
       orders={demoData.orders}
       groups={demoData.groups}
     >
-      <div className="flex flex-col h-screen bg-slate-950">
+      <div className="flex flex-col h-screen bg-background">
         {/* Header */}
         <div
-          className="flex items-center justify-between px-6 bg-slate-900 border-b border-slate-800"
+          className="flex items-center justify-between px-6 bg-card border-b border-border"
           style={{ height: headerHeight }}
         >
           <div>
-            <h1 className="text-xl font-semibold text-white">
+            <h1 className="text-xl font-semibold text-foreground">
               Right Sidebar + Floating Toolbar
             </h1>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-muted-foreground">
               Detail panel on right, floating controls
             </p>
           </div>
@@ -118,7 +118,7 @@ function MainContent({
 
       {/* Detail panel on right (appears when task selected) */}
       <div
-        className="bg-slate-900 border-l border-slate-700 transition-all duration-300 overflow-hidden"
+        className="bg-card border-l border-border transition-all duration-300 overflow-hidden"
         style={{ width: detailPanelWidth }}
       >
         {showDetailPanel && <TaskDetailPanel />}
@@ -150,8 +150,8 @@ function TaskDetailPanel() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
-        <h3 className="text-sm font-medium text-white">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h3 className="text-sm font-medium text-foreground">
           {multipleSelected
             ? `${selectedTasks.length} Tasks Selected`
             : "Task Details"}
@@ -159,7 +159,7 @@ function TaskDetailPanel() {
         <button
           type="button"
           onClick={clearSelection}
-          className="p-1 rounded hover:bg-slate-700 text-slate-400 hover:text-white"
+          className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground"
         >
           <X className="w-4 h-4" />
         </button>
@@ -182,15 +182,15 @@ function SingleTaskDetails({ task }: { task: Task }) {
     <>
       {/* Task name */}
       <div>
-        <span className="text-xs text-slate-500 uppercase tracking-wide block">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide block">
           Name
         </span>
-        <p className="text-sm text-white mt-1">{task.name}</p>
+        <p className="text-sm text-foreground mt-1">{task.name}</p>
       </div>
 
       {/* Status badge */}
       <div>
-        <span className="text-xs text-slate-500 uppercase tracking-wide block">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide block">
           Status
         </span>
         <div className="mt-1">
@@ -201,50 +201,52 @@ function SingleTaskDetails({ task }: { task: Task }) {
       {/* Time info */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <span className="text-xs text-slate-500 uppercase tracking-wide flex items-center gap-1">
+          <span className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1">
             <Calendar className="w-3 h-3" /> Start
           </span>
-          <p className="text-sm text-white mt-1">
+          <p className="text-sm text-foreground mt-1">
             {format(new Date(task.startTime), "MMM d, HH:mm")}
           </p>
         </div>
         <div>
-          <span className="text-xs text-slate-500 uppercase tracking-wide flex items-center gap-1">
+          <span className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1">
             <Clock className="w-3 h-3" /> Duration
           </span>
-          <p className="text-sm text-white mt-1">{task._totalDuration} min</p>
+          <p className="text-sm text-foreground mt-1">
+            {task._totalDuration} min
+          </p>
         </div>
       </div>
 
       {/* Progress */}
       <div>
-        <span className="text-xs text-slate-500 uppercase tracking-wide block">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide block">
           Progress
         </span>
         <div className="mt-2">
-          <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+          <div className="h-2 bg-secondary rounded-full overflow-hidden">
             <div
-              className="h-full bg-cyan-500 transition-all"
+              className="h-full bg-primary transition-all"
               style={{ width: `${task.progress}%` }}
             />
           </div>
-          <p className="text-xs text-slate-400 mt-1">{task.progress}%</p>
+          <p className="text-xs text-muted-foreground mt-1">{task.progress}%</p>
         </div>
       </div>
 
       {/* Priority */}
       <div>
-        <span className="text-xs text-slate-500 uppercase tracking-wide flex items-center gap-1">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1">
           <Flag className="w-3 h-3" /> Priority
         </span>
-        <p className="text-sm text-white mt-1">
+        <p className="text-sm text-foreground mt-1">
           {["Lowest", "Low", "Medium", "High", "Highest"][task.priority - 1]}
         </p>
       </div>
 
       {/* Phases */}
       <div>
-        <span className="text-xs text-slate-500 uppercase tracking-wide block">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide block">
           Phases
         </span>
         <div className="mt-2 space-y-1">
@@ -253,8 +255,12 @@ function SingleTaskDetails({ task }: { task: Task }) {
               key={phase.type}
               className="flex items-center justify-between text-sm"
             >
-              <span className="text-slate-300 capitalize">{phase.type}</span>
-              <span className="text-slate-400">{phase.duration} min</span>
+              <span className="text-foreground/80 capitalize">
+                {phase.type}
+              </span>
+              <span className="text-muted-foreground">
+                {phase.duration} min
+              </span>
             </div>
           ))}
         </div>
@@ -271,19 +277,21 @@ function MultiTaskSummary({ tasks }: { tasks: Task[] }) {
 
   return (
     <>
-      <div className="bg-slate-800 rounded-lg p-4 space-y-3">
+      <div className="bg-secondary rounded-lg p-4 space-y-3">
         <div className="flex justify-between">
-          <span className="text-slate-400">Total Duration</span>
-          <span className="text-white font-medium">{totalDuration} min</span>
+          <span className="text-muted-foreground">Total Duration</span>
+          <span className="text-foreground font-medium">
+            {totalDuration} min
+          </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-slate-400">Average Progress</span>
-          <span className="text-white font-medium">{avgProgress}%</span>
+          <span className="text-muted-foreground">Average Progress</span>
+          <span className="text-foreground font-medium">{avgProgress}%</span>
         </div>
       </div>
 
       <div>
-        <span className="text-xs text-slate-500 uppercase tracking-wide block">
+        <span className="text-xs text-muted-foreground uppercase tracking-wide block">
           Selected Tasks
         </span>
         <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
@@ -292,7 +300,7 @@ function MultiTaskSummary({ tasks }: { tasks: Task[] }) {
               key={task.id}
               className="flex items-center justify-between text-sm py-1"
             >
-              <span className="text-slate-300 truncate">{task.name}</span>
+              <span className="text-foreground/80 truncate">{task.name}</span>
               <StatusBadge status={task.status} size="sm" />
             </div>
           ))}
@@ -310,10 +318,10 @@ function StatusBadge({
   size?: "sm" | "md";
 }) {
   const colors = {
-    scheduled: "bg-slate-600 text-slate-200",
-    in_progress: "bg-blue-600 text-blue-100",
-    completed: "bg-green-600 text-green-100",
-    blocked: "bg-red-600 text-red-100",
+    scheduled: "bg-secondary text-secondary-foreground",
+    in_progress: "bg-primary/20 text-primary",
+    completed: "bg-success/20 text-success",
+    blocked: "bg-destructive/20 text-destructive",
   };
 
   const sizeClasses = {
@@ -334,7 +342,7 @@ function ZoomIndicator() {
   const zoomLevel = useGanttZoom();
 
   return (
-    <div className="absolute top-4 right-4 px-3 py-1.5 bg-slate-800/80 backdrop-blur-sm rounded text-xs text-slate-300 border border-slate-700">
+    <div className="absolute top-4 right-4 px-3 py-1.5 bg-card/80 backdrop-blur-sm rounded text-xs text-muted-foreground border border-border">
       Zoom: {zoomLevel}
     </div>
   );
@@ -349,7 +357,7 @@ function TaskCountSelector({
 }) {
   return (
     <div className="flex items-center gap-4">
-      <span className="text-sm text-slate-400">Tasks:</span>
+      <span className="text-sm text-muted-foreground">Tasks:</span>
       <div className="flex gap-2">
         {[100, 500, 1000, 2500].map((count) => (
           <button
@@ -358,8 +366,8 @@ function TaskCountSelector({
             onClick={() => onChange(count)}
             className={`px-3 py-1.5 text-sm rounded transition-colors ${
               value === count
-                ? "bg-cyan-600 text-white"
-                : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-accent"
             }`}
           >
             {count >= 1000 ? `${count / 1000}k` : count}

@@ -53,7 +53,7 @@ export function TodayButton({
     <button
       type="button"
       onClick={handleClick}
-      className={`${sizeClasses[size]} flex items-center gap-1.5 rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors ${className}`}
+      className={`${sizeClasses[size]} flex items-center gap-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors ${className}`}
       title="Scroll to today"
     >
       <Calendar className={iconSizes[size]} />

@@ -67,7 +67,7 @@ function GanttMinimal() {
       groups={demoData.groups}
       initialZoom="day"
     >
-      <div className="flex flex-col h-screen bg-slate-950">
+      <div className="flex flex-col h-screen bg-background">
         {/* Minimal header with custom controls */}
         <MinimalHeader taskCount={taskCount} onTaskCountChange={setTaskCount} />
 
@@ -107,15 +107,17 @@ function MinimalHeader({
     visibleStartTime + (viewport.width / viewport.pixelsPerHour) * 3600000;
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-slate-900/80 backdrop-blur-sm border-b border-slate-800">
+    <div className="flex items-center justify-between px-4 py-3 bg-card/80 backdrop-blur-sm border-b border-border">
       {/* Left: Title and time range */}
       <div className="flex items-center gap-6">
-        <h1 className="text-lg font-semibold text-white">Minimal Layout</h1>
-        <div className="text-sm text-slate-400">
+        <h1 className="text-lg font-semibold text-foreground">
+          Minimal Layout
+        </h1>
+        <div className="text-sm text-muted-foreground">
           {format(new Date(visibleStartTime), "MMM d")} -{" "}
           {format(new Date(visibleEndTime), "MMM d, yyyy")}
         </div>
-        <div className="px-2 py-0.5 rounded bg-slate-700 text-xs text-slate-300">
+        <div className="px-2 py-0.5 rounded bg-secondary text-xs text-secondary-foreground">
           {zoomLevel}
         </div>
       </div>
@@ -129,8 +131,8 @@ function MinimalHeader({
             onClick={() => onTaskCountChange(count)}
             className={`px-2.5 py-1 text-xs rounded transition-colors ${
               taskCount === count
-                ? "bg-cyan-600 text-white"
-                : "bg-slate-800 text-slate-400 hover:bg-slate-700"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-accent"
             }`}
           >
             {count}
@@ -153,22 +155,22 @@ function CornerControls() {
   return (
     <div className="absolute top-4 left-4 flex flex-col gap-2">
       {/* Zoom controls */}
-      <div className="flex flex-col bg-slate-800/90 backdrop-blur-sm rounded-lg border border-slate-700 overflow-hidden">
+      <div className="flex flex-col bg-card/90 backdrop-blur-sm rounded-lg border border-border overflow-hidden">
         <IconButton onClick={handleZoomIn} title="Zoom in">
           <ZoomIn className="w-4 h-4" />
         </IconButton>
-        <div className="h-px bg-slate-700" />
+        <div className="h-px bg-border" />
         <IconButton onClick={handleZoomOut} title="Zoom out">
           <ZoomOut className="w-4 h-4" />
         </IconButton>
       </div>
 
       {/* Undo/Redo */}
-      <div className="flex flex-col bg-slate-800/90 backdrop-blur-sm rounded-lg border border-slate-700 overflow-hidden">
+      <div className="flex flex-col bg-card/90 backdrop-blur-sm rounded-lg border border-border overflow-hidden">
         <IconButton onClick={undo} disabled={!canUndo} title="Undo">
           <RotateCcw className="w-4 h-4" />
         </IconButton>
-        <div className="h-px bg-slate-700" />
+        <div className="h-px bg-border" />
         <IconButton onClick={redo} disabled={!canRedo} title="Redo">
           <RotateCw className="w-4 h-4" />
         </IconButton>
@@ -187,7 +189,7 @@ function TimeNavigator() {
 
   return (
     <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-      <div className="flex items-center gap-1 bg-slate-800/90 backdrop-blur-sm rounded-full border border-slate-700 px-2 py-1">
+      <div className="flex items-center gap-1 bg-card/90 backdrop-blur-sm rounded-full border border-border px-2 py-1">
         <IconButton onClick={handlePanLeft} title="Pan left" size="sm">
           <ChevronLeft className="w-4 h-4" />
         </IconButton>
@@ -195,7 +197,7 @@ function TimeNavigator() {
         <button
           type="button"
           onClick={handleToday}
-          className="flex items-center gap-1.5 px-3 py-1 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-full transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors"
         >
           <Calendar className="w-3.5 h-3.5" />
           Today
@@ -216,13 +218,13 @@ function SelectionIndicator() {
   if (selectedTaskIds.length === 0) return null;
 
   return (
-    <div className="absolute top-4 right-4 flex items-center gap-2 bg-cyan-600/90 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-white">
+    <div className="absolute top-4 right-4 flex items-center gap-2 bg-primary/90 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-primary-foreground">
       <span className="font-medium">{selectedTaskIds.length}</span>
       <span>selected</span>
       <button
         type="button"
         onClick={clearSelection}
-        className="ml-2 px-2 py-0.5 bg-cyan-700 hover:bg-cyan-800 rounded text-xs transition-colors"
+        className="ml-2 px-2 py-0.5 bg-primary-foreground/20 hover:bg-primary-foreground/30 rounded text-xs transition-colors"
       >
         Clear
       </button>
@@ -254,7 +256,7 @@ function IconButton({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`${sizeClasses[size]} text-slate-400 hover:text-white hover:bg-slate-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400`}
+      className={`${sizeClasses[size]} text-muted-foreground hover:text-foreground hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground`}
     >
       {children}
     </button>

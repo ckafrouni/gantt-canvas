@@ -1,21 +1,7 @@
 import { startOfDay } from "date-fns";
 import type { ViewportState, VirtualRow, ZoomLevel } from "../types";
 import { clearCanvas } from "../utils/canvas-utils";
-
-/** Grid rendering colors */
-const COLORS = {
-  background: "#1e293b", // slate-800
-  rowOdd: "#1e293b",
-  rowEven: "#0f172a", // slate-900
-  rowHover: "#334155", // slate-700
-  gridLine: "#334155",
-  gridLineMajor: "#475569", // slate-600
-  todayLine: "#ef4444", // red-500
-  todayBackground: "rgba(239, 68, 68, 0.1)",
-  weekendBackground: "rgba(100, 116, 139, 0.1)",
-  headerText: "#94a3b8", // slate-400
-  groupHeader: "#1e3a5f",
-};
+import { getGridColors } from "../utils/theme-colors";
 
 /** Grid interval in hours based on zoom level */
 const GRID_INTERVALS: Record<ZoomLevel, { minor: number; major: number }> = {
@@ -57,6 +43,7 @@ export class GridRenderer {
     if (!this.ctx) return;
 
     const ctx = this.ctx;
+    const COLORS = getGridColors();
 
     // Clear canvas
     clearCanvas(ctx, this.width, this.height);
@@ -66,16 +53,16 @@ export class GridRenderer {
     ctx.fillRect(0, 0, this.width, this.height);
 
     // Draw row backgrounds
-    this.renderRowBackgrounds(ctx, viewport, visibleRows, hoveredRowId);
+    this.renderRowBackgrounds(ctx, viewport, visibleRows, hoveredRowId, COLORS);
 
     // Draw vertical grid lines (time)
-    this.renderTimeGrid(ctx, viewport);
+    this.renderTimeGrid(ctx, viewport, COLORS);
 
     // Draw today marker
-    this.renderTodayMarker(ctx, viewport);
+    this.renderTodayMarker(ctx, viewport, COLORS);
 
     // Draw horizontal row separators
-    this.renderRowSeparators(ctx, viewport, visibleRows);
+    this.renderRowSeparators(ctx, viewport, visibleRows, COLORS);
   }
 
   /**
@@ -86,6 +73,7 @@ export class GridRenderer {
     viewport: ViewportState,
     visibleRows: VirtualRow[],
     hoveredRowId: string | null,
+    COLORS: ReturnType<typeof getGridColors>,
   ): void {
     for (let i = 0; i < visibleRows.length; i++) {
       const row = visibleRows[i];
@@ -115,6 +103,7 @@ export class GridRenderer {
   private renderTimeGrid(
     ctx: CanvasRenderingContext2D,
     viewport: ViewportState,
+    COLORS: ReturnType<typeof getGridColors>,
   ): void {
     const { zoomLevel, pixelsPerHour, scrollX, timeOrigin } = viewport;
     const intervals = GRID_INTERVALS[zoomLevel];
@@ -160,6 +149,7 @@ export class GridRenderer {
   private renderTodayMarker(
     ctx: CanvasRenderingContext2D,
     viewport: ViewportState,
+    COLORS: ReturnType<typeof getGridColors>,
   ): void {
     const now = Date.now();
     const { pixelsPerHour, scrollX, timeOrigin } = viewport;
@@ -202,6 +192,7 @@ export class GridRenderer {
     ctx: CanvasRenderingContext2D,
     viewport: ViewportState,
     visibleRows: VirtualRow[],
+    COLORS: ReturnType<typeof getGridColors>,
   ): void {
     ctx.strokeStyle = COLORS.gridLine;
     ctx.lineWidth = 0.5;

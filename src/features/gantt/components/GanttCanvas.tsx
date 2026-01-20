@@ -143,7 +143,8 @@ export function GanttCanvas({
     });
 
     scheduler.registerRenderer("interaction", () => {
-      getInteractionRenderer().render(viewport, drag, null, tasks);
+      // Default minResolution of 30 minutes for non-composable version
+      getInteractionRenderer().render(viewport, drag, null, tasks, 30);
     });
 
     // Mark all dirty on state change

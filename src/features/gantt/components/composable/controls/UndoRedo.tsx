@@ -1,5 +1,9 @@
 import { Undo, Redo } from "lucide-react";
-import { useGanttActions, useGanttCanUndo, useGanttCanRedo } from "../../../context/gantt-context";
+import {
+  useGanttActions,
+  useGanttCanUndo,
+  useGanttCanRedo,
+} from "../../../context/gantt-context";
 
 export interface UndoRedoProps {
   /** Size variant */
@@ -25,7 +29,11 @@ const iconSizes = {
 /**
  * Undo/Redo buttons with optional labels.
  */
-export function UndoRedo({ size = "md", showLabels = false, className = "" }: UndoRedoProps) {
+export function UndoRedo({
+  size = "md",
+  showLabels = false,
+  className = "",
+}: UndoRedoProps) {
   const { undo, redo } = useGanttActions();
   const canUndo = useGanttCanUndo();
   const canRedo = useGanttCanRedo();
@@ -36,7 +44,7 @@ export function UndoRedo({ size = "md", showLabels = false, className = "" }: Un
         type="button"
         onClick={undo}
         disabled={!canUndo}
-        className={`${sizeClasses[size]} rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400 flex items-center gap-1`}
+        className={`${sizeClasses[size]} rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground flex items-center gap-1`}
         title="Undo (Ctrl+Z)"
       >
         <Undo className={iconSizes[size]} />
@@ -46,7 +54,7 @@ export function UndoRedo({ size = "md", showLabels = false, className = "" }: Un
         type="button"
         onClick={redo}
         disabled={!canRedo}
-        className={`${sizeClasses[size]} rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400 flex items-center gap-1`}
+        className={`${sizeClasses[size]} rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-muted-foreground flex items-center gap-1`}
         title="Redo (Ctrl+Shift+Z)"
       >
         <Redo className={iconSizes[size]} />
@@ -68,7 +76,11 @@ export interface UndoButtonProps {
 /**
  * Standalone Undo button.
  */
-export function UndoButton({ size = "md", showLabel = false, className = "" }: UndoButtonProps) {
+export function UndoButton({
+  size = "md",
+  showLabel = false,
+  className = "",
+}: UndoButtonProps) {
   const { undo } = useGanttActions();
   const canUndo = useGanttCanUndo();
 
@@ -77,7 +89,7 @@ export function UndoButton({ size = "md", showLabel = false, className = "" }: U
       type="button"
       onClick={undo}
       disabled={!canUndo}
-      className={`${sizeClasses[size]} rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 ${className}`}
+      className={`${sizeClasses[size]} rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 ${className}`}
       title="Undo (Ctrl+Z)"
     >
       <Undo className={iconSizes[size]} />
@@ -98,7 +110,11 @@ export interface RedoButtonProps {
 /**
  * Standalone Redo button.
  */
-export function RedoButton({ size = "md", showLabel = false, className = "" }: RedoButtonProps) {
+export function RedoButton({
+  size = "md",
+  showLabel = false,
+  className = "",
+}: RedoButtonProps) {
   const { redo } = useGanttActions();
   const canRedo = useGanttCanRedo();
 
@@ -107,7 +123,7 @@ export function RedoButton({ size = "md", showLabel = false, className = "" }: R
       type="button"
       onClick={redo}
       disabled={!canRedo}
-      className={`${sizeClasses[size]} rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 ${className}`}
+      className={`${sizeClasses[size]} rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 ${className}`}
       title="Redo (Ctrl+Shift+Z)"
     >
       <Redo className={iconSizes[size]} />

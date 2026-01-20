@@ -1,6 +1,9 @@
 import { Layers } from "lucide-react";
 import type { GroupingMode } from "../../../types";
-import { useGanttGroupingMode, useGanttActions } from "../../../context/gantt-context";
+import {
+  useGanttGroupingMode,
+  useGanttActions,
+} from "../../../context/gantt-context";
 
 export interface GroupingSelectProps {
   /** Size variant */
@@ -32,17 +35,23 @@ const groupingModes: { value: GroupingMode; label: string }[] = [
 /**
  * Grouping mode dropdown selector.
  */
-export function GroupingSelect({ size = "md", showIcon = true, className = "" }: GroupingSelectProps) {
+export function GroupingSelect({
+  size = "md",
+  showIcon = true,
+  className = "",
+}: GroupingSelectProps) {
   const groupingMode = useGanttGroupingMode();
   const { setGroupingMode } = useGanttActions();
 
   return (
     <div className={`flex items-center gap-1.5 ${className}`}>
-      {showIcon && <Layers className={`${iconSizes[size]} text-slate-500`} />}
+      {showIcon && (
+        <Layers className={`${iconSizes[size]} text-muted-foreground`} />
+      )}
       <select
         value={groupingMode}
         onChange={(e) => setGroupingMode(e.target.value as GroupingMode)}
-        className={`${selectSizes[size]} bg-slate-700 border border-slate-600 rounded text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500`}
+        className={`${selectSizes[size]} bg-secondary border border-border rounded text-foreground focus:outline-none focus:ring-1 focus:ring-ring`}
       >
         {groupingModes.map((mode) => (
           <option key={mode.value} value={mode.value}>

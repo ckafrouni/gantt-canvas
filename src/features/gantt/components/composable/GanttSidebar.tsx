@@ -93,12 +93,12 @@ export function GanttSidebar({
     return (
       <button
         type="button"
-        className={`flex items-center justify-center bg-slate-900 ${borderClass} border-slate-700 cursor-pointer hover:bg-slate-800 transition-colors ${className}`}
+        className={`flex items-center justify-center bg-card ${borderClass} border-border cursor-pointer hover:bg-accent transition-colors ${className}`}
         style={{ width: 32, height }}
         onClick={() => setIsCollapsed(false)}
       >
         <ChevronRight
-          className={`w-4 h-4 text-slate-400 ${position === "right" ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-muted-foreground ${position === "right" ? "rotate-180" : ""}`}
         />
       </button>
     );
@@ -106,14 +106,14 @@ export function GanttSidebar({
 
   return (
     <div
-      className={`relative bg-slate-900 ${borderClass} border-slate-700 overflow-hidden ${className}`}
+      className={`relative bg-card ${borderClass} border-border overflow-hidden ${className}`}
       style={{ width: sidebarWidth, height }}
     >
       {/* Collapse button */}
       {collapsible && (
         <button
           type="button"
-          className={`absolute top-2 ${position === "left" ? "right-2" : "left-2"} p-1 rounded hover:bg-slate-700 text-slate-500 hover:text-slate-300 z-10`}
+          className={`absolute top-2 ${position === "left" ? "right-2" : "left-2"} p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground z-10`}
           onClick={() => setIsCollapsed(true)}
         >
           <ChevronRight
@@ -185,7 +185,7 @@ function GroupHeaderRow({ row, onClick }: GroupHeaderRowProps) {
   return (
     <button
       type="button"
-      className="absolute left-0 right-0 flex items-center px-2 bg-slate-800 border-b border-slate-700 cursor-pointer hover:bg-slate-700 transition-all duration-200 text-left"
+      className="absolute left-0 right-0 flex items-center px-2 bg-secondary border-b border-border cursor-pointer hover:bg-accent transition-all duration-200 text-left"
       style={{
         top: row.virtualY,
         height: row.height,
@@ -199,9 +199,9 @@ function GroupHeaderRow({ row, onClick }: GroupHeaderRowProps) {
           transform: row.isCollapsed ? "rotate(0deg)" : "rotate(90deg)",
         }}
       >
-        <ChevronRight className="w-4 h-4 text-slate-400 mr-1" />
+        <ChevronRight className="w-4 h-4 text-muted-foreground mr-1" />
       </span>
-      <span className="text-sm font-medium text-slate-200 truncate">
+      <span className="text-sm font-medium text-foreground truncate">
         {row.groupName}
       </span>
     </button>
@@ -239,7 +239,7 @@ function ResourceRow({
 
   return (
     <div
-      className="absolute left-0 right-0 flex items-center px-3 border-b border-slate-800 hover:bg-slate-800/50 transition-all duration-200"
+      className="absolute left-0 right-0 flex items-center px-3 border-b border-border/50 hover:bg-accent/50 transition-all duration-200"
       style={{
         top: row.virtualY,
         height: row.height,
@@ -248,8 +248,10 @@ function ResourceRow({
         transitionDelay: isNew ? `${staggerDelay}ms` : "0ms",
       }}
     >
-      <Icon className="w-4 h-4 text-slate-500 mr-2 shrink-0" />
-      <span className="text-sm text-slate-300 truncate">{resourceName}</span>
+      <Icon className="w-4 h-4 text-muted-foreground mr-2 shrink-0" />
+      <span className="text-sm text-foreground/80 truncate">
+        {resourceName}
+      </span>
     </div>
   );
 }
@@ -284,7 +286,7 @@ function ResizeHandle({ position, onResize }: ResizeHandleProps) {
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: resize handle requires mouse interaction
     <div
-      className={`absolute top-0 bottom-0 w-1 cursor-ew-resize hover:bg-cyan-500/50 transition-colors ${
+      className={`absolute top-0 bottom-0 w-1 cursor-ew-resize hover:bg-primary/50 transition-colors ${
         position === "left" ? "right-0" : "left-0"
       }`}
       onMouseDown={handleMouseDown}

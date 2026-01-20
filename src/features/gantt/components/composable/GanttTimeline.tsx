@@ -111,7 +111,15 @@ export function GanttTimeline({
     }
 
     return result;
-  }, [visibleStartTime, visibleEndTime, scrollX, pixelsPerHour, timeOrigin, zoomLevel, width]);
+  }, [
+    visibleStartTime,
+    visibleEndTime,
+    scrollX,
+    pixelsPerHour,
+    timeOrigin,
+    zoomLevel,
+    width,
+  ]);
 
   // Generate day headers for day/hour zoom
   const dayHeaders = useMemo(() => {
@@ -141,7 +149,15 @@ export function GanttTimeline({
     }
 
     return result;
-  }, [visibleStartTime, visibleEndTime, scrollX, pixelsPerHour, timeOrigin, zoomLevel, width]);
+  }, [
+    visibleStartTime,
+    visibleEndTime,
+    scrollX,
+    pixelsPerHour,
+    timeOrigin,
+    zoomLevel,
+    width,
+  ]);
 
   // Current time indicator position
   const currentTimeX = useMemo(() => {
@@ -156,20 +172,20 @@ export function GanttTimeline({
 
   return (
     <div
-      className={`relative bg-slate-900 ${borderClass} border-slate-700 overflow-hidden select-none ${className}`}
+      className={`relative bg-card ${borderClass} border-border overflow-hidden select-none ${className}`}
       style={{ width, height }}
     >
       {/* Day headers (top row for top position, bottom row for bottom position) */}
       {dayHeaders.length > 0 && (
         <div
-          className={`absolute left-0 right-0 h-6 border-slate-700 ${
+          className={`absolute left-0 right-0 h-6 border-border ${
             position === "top" ? "top-0 border-b" : "bottom-0 border-t"
           }`}
         >
           {dayHeaders.map((header) => (
             <div
               key={header.date.getTime()}
-              className="absolute h-full flex items-center justify-center text-xs font-medium text-slate-300 border-r border-slate-700"
+              className="absolute h-full flex items-center justify-center text-xs font-medium text-foreground/80 border-r border-border"
               style={{
                 left: header.x,
                 width: header.width,
@@ -200,12 +216,14 @@ export function GanttTimeline({
           >
             {/* Tick mark */}
             <div
-              className={`w-px ${marker.isMajor ? "h-3 bg-slate-500" : "h-2 bg-slate-600"}`}
+              className={`w-px ${marker.isMajor ? "h-3 bg-muted-foreground" : "h-2 bg-border"}`}
             />
             {/* Label */}
             <span
               className={`text-xs whitespace-nowrap ${
-                marker.isMajor ? "text-slate-300 font-medium" : "text-slate-500"
+                marker.isMajor
+                  ? "text-foreground/80 font-medium"
+                  : "text-muted-foreground"
               }`}
               style={{
                 transform: "translateX(-50%)",
@@ -222,11 +240,11 @@ export function GanttTimeline({
       {/* Current time indicator */}
       {currentTimeX !== null && (
         <div
-          className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
+          className="absolute top-0 bottom-0 w-0.5 bg-destructive z-10"
           style={{ left: currentTimeX }}
         >
           <div
-            className={`absolute w-2 h-2 bg-red-500 rounded-full ${
+            className={`absolute w-2 h-2 bg-destructive rounded-full ${
               position === "top" ? "-bottom-1" : "-top-1"
             }`}
             style={{ left: -3 }}

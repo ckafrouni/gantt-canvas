@@ -70,6 +70,27 @@ function getZoomLevel(pixelsPerHour: number): ZoomLevel {
   return "month";
 }
 
+/** Zoom-based snap intervals in minutes */
+const ZOOM_SNAP_INTERVALS: Record<ZoomLevel, number> = {
+  hour: 15,
+  day: 60,
+  week: 360, // 6 hours
+  month: 1440, // 24 hours
+};
+
+/**
+ * Get snap interval in milliseconds based on zoom level and minimum resolution.
+ * The snap interval scales with zoom but never goes below minResolution.
+ */
+export function getSnapIntervalMs(
+  zoomLevel: ZoomLevel,
+  minResolution: number,
+): number {
+  const zoomSnapMinutes = ZOOM_SNAP_INTERVALS[zoomLevel];
+  const effectiveSnapMinutes = Math.max(zoomSnapMinutes, minResolution);
+  return effectiveSnapMinutes * 60 * 1000;
+}
+
 /** Combined store state */
 export interface GanttStoreState {
   // Data
@@ -86,6 +107,9 @@ export interface GanttStoreState {
   drag: DragState | null;
   hoveredTaskId: TaskId | null;
   sidebarWidth: number;
+
+  // Config
+  minResolution: number; // Minimum snap resolution in minutes (default: 30)
 
   // Loading state
   isLoading: boolean;
@@ -175,6 +199,9 @@ export interface GanttStoreActions {
 
 export type GanttStore = GanttStoreState & GanttStoreActions;
 
+/** Default minimum resolution in minutes */
+export const DEFAULT_MIN_RESOLUTION = 30;
+
 /** Initial state factory */
 function createInitialState(): GanttStoreState {
   return {
@@ -205,6 +232,7 @@ function createInitialState(): GanttStoreState {
     drag: null,
     hoveredTaskId: null,
     sidebarWidth: 200,
+    minResolution: DEFAULT_MIN_RESOLUTION,
     isLoading: false,
     error: null,
   };
@@ -217,6 +245,8 @@ export interface GanttStoreConfig {
   initialGrouping?: GroupingMode;
   sidebarWidth?: number;
   rowHeight?: number;
+  /** Minimum snap resolution in minutes (default: 30) */
+  minResolution?: number;
 }
 
 /** Create an isolated Gantt store instance */
@@ -240,6 +270,9 @@ export function createGanttStore(config: GanttStoreConfig = {}) {
   }
   if (config.rowHeight) {
     initialState.viewport.rowHeight = config.rowHeight;
+  }
+  if (config.minResolution !== undefined) {
+    initialState.minResolution = config.minResolution;
   }
 
   return create<GanttStore>()(
@@ -579,11 +612,14 @@ export function createGanttStore(config: GanttStoreConfig = {}) {
             set((state) => {
               if (!state.drag) return;
 
-              const { viewport } = state;
+              const { viewport, minResolution } = state;
               const deltaX = currentX - state.drag.startX;
 
               const hoursPerPixel = 1 / viewport.pixelsPerHour;
               const deltaTimeMs = deltaX * hoursPerPixel * 60 * 60 * 1000;
+
+              // Minimum task duration based on minResolution
+              const minDurationMs = minResolution * 60 * 1000;
 
               state.drag.currentX = currentX;
               state.drag.currentY = currentY;
@@ -601,14 +637,14 @@ export function createGanttStore(config: GanttStoreConfig = {}) {
                   state.drag.originalTask.startTime + deltaTimeMs;
                 state.drag.previewStartTime = Math.min(
                   newStartTime,
-                  state.drag.originalTask._endTime - 15 * 60 * 1000,
+                  state.drag.originalTask._endTime - minDurationMs,
                 );
               } else if (state.drag.type === "resize-end") {
                 const newEndTime =
                   state.drag.originalTask._endTime + deltaTimeMs;
                 state.drag.previewEndTime = Math.max(
                   newEndTime,
-                  state.drag.originalTask.startTime + 15 * 60 * 1000,
+                  state.drag.originalTask.startTime + minDurationMs,
                 );
               }
             }),
@@ -633,16 +669,26 @@ export function createGanttStore(config: GanttStoreConfig = {}) {
 
             const originalTask = state.tasks[taskId];
 
+            // Snap times to minResolution
+            const snapInterval = getSnapIntervalMs(
+              state.viewport.zoomLevel,
+              state.minResolution,
+            );
+            const snappedStartTime =
+              Math.round(previewStartTime / snapInterval) * snapInterval;
+            const snappedEndTime =
+              Math.round(previewEndTime / snapInterval) * snapInterval;
+
             if (state.drag.type === "move" || state.drag.type === "reassign") {
               get().updateTask(taskId, {
-                startTime: previewStartTime,
+                startTime: snappedStartTime,
                 resourceId: previewResourceId,
               });
             } else if (
               state.drag.type === "resize-start" ||
               state.drag.type === "resize-end"
             ) {
-              const newDurationMs = previewEndTime - previewStartTime;
+              const newDurationMs = snappedEndTime - snappedStartTime;
               const newDurationMinutes = newDurationMs / (60 * 1000);
 
               const scaleFactor =
@@ -653,7 +699,7 @@ export function createGanttStore(config: GanttStoreConfig = {}) {
               }));
 
               get().updateTask(taskId, {
-                startTime: previewStartTime,
+                startTime: snappedStartTime,
                 phases: newPhases,
               });
             }

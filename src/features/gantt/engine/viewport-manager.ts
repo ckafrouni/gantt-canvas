@@ -210,29 +210,32 @@ export class ViewportManager {
     return availableWidth / durationHours;
   }
 
+  /** Zoom-based snap intervals in minutes */
+  private static readonly ZOOM_SNAP_INTERVALS: Record<string, number> = {
+    hour: 15,
+    day: 60,
+    week: 360, // 6 hours
+    month: 1440, // 24 hours
+  };
+
   /**
-   * Get snap interval based on zoom level (in ms)
+   * Get snap interval based on zoom level and minimum resolution (in ms).
+   * The snap interval scales with zoom but never goes below minResolution.
+   * @param minResolution - Minimum resolution in minutes (default: 30)
    */
-  getSnapInterval(): number {
-    switch (this.viewport.zoomLevel) {
-      case "hour":
-        return 15 * 60 * 1000; // 15 minutes
-      case "day":
-        return 60 * 60 * 1000; // 1 hour
-      case "week":
-        return 6 * 60 * 60 * 1000; // 6 hours
-      case "month":
-        return 24 * 60 * 60 * 1000; // 1 day
-      default:
-        return 60 * 60 * 1000;
-    }
+  getSnapInterval(minResolution = 30): number {
+    const zoomSnapMinutes =
+      ViewportManager.ZOOM_SNAP_INTERVALS[this.viewport.zoomLevel] ?? 60;
+    const effectiveSnapMinutes = Math.max(zoomSnapMinutes, minResolution);
+    return effectiveSnapMinutes * 60 * 1000;
   }
 
   /**
    * Snap a timestamp to the nearest grid line
+   * @param minResolution - Minimum resolution in minutes (default: 30)
    */
-  snapToGrid(timestamp: number): number {
-    const interval = this.getSnapInterval();
+  snapToGrid(timestamp: number, minResolution = 30): number {
+    const interval = this.getSnapInterval(minResolution);
     return Math.round(timestamp / interval) * interval;
   }
 

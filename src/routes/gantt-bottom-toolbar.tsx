@@ -61,17 +61,17 @@ function GanttBottomToolbar() {
       orders={demoData.orders}
       groups={demoData.groups}
     >
-      <div className="flex flex-col h-screen bg-slate-950">
+      <div className="flex flex-col h-screen bg-background">
         {/* Header */}
         <div
-          className="flex items-center justify-between px-6 bg-slate-900 border-b border-slate-800"
+          className="flex items-center justify-between px-6 bg-card border-b border-border"
           style={{ height: headerHeight }}
         >
           <div>
-            <h1 className="text-xl font-semibold text-white">
+            <h1 className="text-xl font-semibold text-foreground">
               Bottom Toolbar Layout
             </h1>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-muted-foreground">
               Toolbar at bottom, like video editing software
             </p>
           </div>
@@ -85,7 +85,7 @@ function GanttBottomToolbar() {
           {/* Sidebar on left */}
           <div className="flex flex-col" style={{ width: sidebarWidth }}>
             <div
-              className="flex items-center px-3 bg-slate-900 border-b border-slate-700 text-sm font-medium text-slate-400"
+              className="flex items-center px-3 bg-card border-b border-border text-sm font-medium text-muted-foreground"
               style={{ height: timelineHeight }}
             >
               Resources
@@ -119,7 +119,7 @@ function TaskCountSelector({
 }) {
   return (
     <div className="flex items-center gap-4">
-      <span className="text-sm text-slate-400">Tasks:</span>
+      <span className="text-sm text-muted-foreground">Tasks:</span>
       <div className="flex gap-2">
         {[100, 500, 1000, 2500].map((count) => (
           <button
@@ -128,8 +128,8 @@ function TaskCountSelector({
             onClick={() => onChange(count)}
             className={`px-3 py-1.5 text-sm rounded transition-colors ${
               value === count
-                ? "bg-cyan-600 text-white"
-                : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-accent"
             }`}
           >
             {count >= 1000 ? `${count / 1000}k` : count}
@@ -145,32 +145,32 @@ function SelectionInfoBar() {
 
   if (selectedTasks.length === 0) {
     return (
-      <div className="px-6 py-2 bg-slate-900 border-t border-slate-800 text-sm text-slate-500">
+      <div className="px-6 py-2 bg-card border-t border-border text-sm text-muted-foreground">
         Click a task to select it, or drag to move/resize
       </div>
     );
   }
 
   return (
-    <div className="px-6 py-2 bg-slate-900 border-t border-slate-800">
+    <div className="px-6 py-2 bg-card border-t border-border">
       <div className="flex items-center gap-6 text-sm">
-        <span className="text-cyan-400 font-medium">
+        <span className="text-primary font-medium">
           {selectedTasks.length} task{selectedTasks.length > 1 ? "s" : ""}{" "}
           selected
         </span>
         {selectedTasks.length === 1 && (
           <>
-            <span className="text-slate-400">
+            <span className="text-muted-foreground">
               Name:{" "}
-              <span className="text-slate-200">{selectedTasks[0].name}</span>
+              <span className="text-foreground">{selectedTasks[0].name}</span>
             </span>
-            <span className="text-slate-400">
+            <span className="text-muted-foreground">
               Status:{" "}
-              <span className="text-slate-200">{selectedTasks[0].status}</span>
+              <span className="text-foreground">{selectedTasks[0].status}</span>
             </span>
-            <span className="text-slate-400">
+            <span className="text-muted-foreground">
               Progress:{" "}
-              <span className="text-slate-200">
+              <span className="text-foreground">
                 {selectedTasks[0].progress}%
               </span>
             </span>

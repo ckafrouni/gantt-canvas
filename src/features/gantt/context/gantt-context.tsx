@@ -266,6 +266,11 @@ export function useGanttSidebarWidth(): number {
   return useGanttStore((s) => s.sidebarWidth);
 }
 
+/** Get minimum resolution in minutes */
+export function useGanttMinResolution(): number {
+  return useGanttStore((s) => s.minResolution);
+}
+
 /** Check if can undo */
 export function useGanttCanUndo(): boolean {
   const store = useGanttStoreApi();

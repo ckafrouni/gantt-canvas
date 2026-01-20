@@ -1,6 +1,10 @@
 import { ZoomIn, ZoomOut } from "lucide-react";
 import type { ZoomLevel } from "../../../types";
-import { useGanttZoom, useGanttActions, useGanttViewport } from "../../../context/gantt-context";
+import {
+  useGanttZoom,
+  useGanttActions,
+  useGanttViewport,
+} from "../../../context/gantt-context";
 
 export interface ZoomButtonsProps {
   /** Size variant */
@@ -41,7 +45,7 @@ export function ZoomButtons({ size = "md", className = "" }: ZoomButtonsProps) {
       <button
         type="button"
         onClick={handleZoomOut}
-        className={`${sizeClasses[size]} rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors`}
+        className={`${sizeClasses[size]} rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors`}
         title="Zoom out"
       >
         <ZoomOut className={iconSizes[size]} />
@@ -49,7 +53,7 @@ export function ZoomButtons({ size = "md", className = "" }: ZoomButtonsProps) {
       <button
         type="button"
         onClick={handleZoomIn}
-        className={`${sizeClasses[size]} rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors`}
+        className={`${sizeClasses[size]} rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors`}
         title="Zoom in"
       >
         <ZoomIn className={iconSizes[size]} />
@@ -89,7 +93,7 @@ export function ZoomSelect({ size = "md", className = "" }: ZoomSelectProps) {
     <select
       value={zoomLevel}
       onChange={(e) => setZoomLevel(e.target.value as ZoomLevel)}
-      className={`${selectSizes[size]} bg-slate-700 border border-slate-600 rounded text-slate-200 focus:outline-none focus:ring-1 focus:ring-cyan-500 ${className}`}
+      className={`${selectSizes[size]} bg-secondary border border-border rounded text-foreground focus:outline-none focus:ring-1 focus:ring-ring ${className}`}
     >
       {zoomLevels.map((level) => (
         <option key={level.value} value={level.value}>
@@ -112,7 +116,11 @@ export interface ZoomControlsProps {
 /**
  * Combined zoom controls with buttons and optional dropdown.
  */
-export function ZoomControls({ size = "md", showSelect = true, className = "" }: ZoomControlsProps) {
+export function ZoomControls({
+  size = "md",
+  showSelect = true,
+  className = "",
+}: ZoomControlsProps) {
   const viewport = useGanttViewport();
   const { zoomViewport } = useGanttActions();
 
@@ -129,7 +137,7 @@ export function ZoomControls({ size = "md", showSelect = true, className = "" }:
       <button
         type="button"
         onClick={handleZoomOut}
-        className={`${sizeClasses[size]} rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors`}
+        className={`${sizeClasses[size]} rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors`}
         title="Zoom out"
       >
         <ZoomOut className={iconSizes[size]} />
@@ -140,7 +148,7 @@ export function ZoomControls({ size = "md", showSelect = true, className = "" }:
       <button
         type="button"
         onClick={handleZoomIn}
-        className={`${sizeClasses[size]} rounded hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors`}
+        className={`${sizeClasses[size]} rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors`}
         title="Zoom in"
       >
         <ZoomIn className={iconSizes[size]} />

@@ -27,8 +27,9 @@ export function GanttToolbar({
   const borderClass = position === "top" ? "border-b" : "border-t";
 
   const variantClasses = {
-    default: `bg-slate-800 ${borderClass} border-slate-700`,
-    floating: "bg-slate-800/95 backdrop-blur-sm rounded-lg shadow-xl border border-slate-700",
+    default: `bg-card ${borderClass} border-border`,
+    floating:
+      "bg-card/95 backdrop-blur-sm rounded-lg shadow-xl border border-border",
     minimal: "bg-transparent",
   };
 
@@ -38,20 +39,22 @@ export function GanttToolbar({
   const showUndo = items.includes("undo");
 
   return (
-    <div className={`flex items-center gap-2 px-4 py-2 ${variantClasses[variant]} ${className}`}>
+    <div
+      className={`flex items-center gap-2 px-4 py-2 ${variantClasses[variant]} ${className}`}
+    >
       {/* Zoom controls */}
       {showZoom && <ZoomControls />}
 
       {/* Divider */}
       {showZoom && (showToday || showGrouping) && (
-        <div className="w-px h-6 bg-slate-600" />
+        <div className="w-px h-6 bg-border" />
       )}
 
       {/* Today button */}
       {showToday && <TodayButton />}
 
       {/* Divider */}
-      {showToday && showGrouping && <div className="w-px h-6 bg-slate-600" />}
+      {showToday && showGrouping && <div className="w-px h-6 bg-border" />}
 
       {/* Grouping */}
       {showGrouping && <GroupingSelect />}

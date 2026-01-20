@@ -7,6 +7,7 @@ import {
 } from "../utils/canvas-utils";
 import { getPhaseRanges, PHASE_COLORS } from "../utils/task-utils";
 import { getIndexManager } from "../indexes/index-manager";
+import { getTaskColors } from "../utils/theme-colors";
 
 /** Task rendering constants */
 const TASK_HEIGHT_RATIO = 0.7; // Task height as ratio of row height
@@ -14,17 +15,6 @@ const TASK_BORDER_RADIUS = 4;
 const TASK_FONT = "12px Inter, system-ui, sans-serif";
 const MIN_TASK_WIDTH_FOR_TEXT = 40;
 const MIN_TASK_WIDTH_FOR_PHASES = 60;
-
-/** Colors */
-const COLORS = {
-  taskDefault: "#3b82f6", // blue-500
-  taskText: "#ffffff",
-  taskTextDark: "#1e293b",
-  selectedBorder: "#fbbf24", // amber-400
-  hoveredBorder: "#60a5fa", // blue-400
-  progressBackground: "rgba(255, 255, 255, 0.3)",
-  progressForeground: "rgba(255, 255, 255, 0.5)",
-};
 
 /**
  * Renders tasks on the canvas
@@ -60,6 +50,7 @@ export class TaskRenderer {
     if (!this.ctx) return;
 
     const ctx = this.ctx;
+    const COLORS = getTaskColors();
     clearCanvas(ctx, this.width, this.height);
 
     const indexManager = getIndexManager();
@@ -111,6 +102,7 @@ export class TaskRenderer {
         row,
         selectedTaskIds.has(task.id),
         hoveredTaskId === task.id,
+        COLORS,
       );
     }
   }
@@ -125,6 +117,7 @@ export class TaskRenderer {
     row: VirtualRow,
     isSelected: boolean,
     isHovered: boolean,
+    COLORS: ReturnType<typeof getTaskColors>,
   ): void {
     // Calculate position
     const x = this.timeToX(task.startTime, viewport);
@@ -146,9 +139,9 @@ export class TaskRenderer {
       width >= MIN_TASK_WIDTH_FOR_PHASES && task.phases.length > 1;
 
     if (showPhases) {
-      this.renderTaskWithPhases(ctx, task, x, taskY, width, taskHeight);
+      this.renderTaskWithPhases(ctx, task, x, taskY, width, taskHeight, COLORS);
     } else {
-      this.renderSimpleTask(ctx, task, x, taskY, width, taskHeight);
+      this.renderSimpleTask(ctx, task, x, taskY, width, taskHeight, COLORS);
     }
 
     // Render selection/hover border
@@ -178,12 +171,20 @@ export class TaskRenderer {
 
     // Render progress indicator
     if (task.progress > 0 && task.progress < 100) {
-      this.renderProgress(ctx, x, taskY, width, taskHeight, task.progress);
+      this.renderProgress(
+        ctx,
+        x,
+        taskY,
+        width,
+        taskHeight,
+        task.progress,
+        COLORS,
+      );
     }
 
     // Render task name
     if (width >= MIN_TASK_WIDTH_FOR_TEXT) {
-      this.renderTaskLabel(ctx, task.name, x, taskY, width, taskHeight);
+      this.renderTaskLabel(ctx, task.name, x, taskY, width, taskHeight, COLORS);
     }
 
     // Render resize handles if hovered
@@ -202,6 +203,7 @@ export class TaskRenderer {
     y: number,
     width: number,
     height: number,
+    COLORS: ReturnType<typeof getTaskColors>,
   ): void {
     const color = task.color ?? COLORS.taskDefault;
     fillRoundRect(ctx, x, y, width, height, TASK_BORDER_RADIUS, color);
@@ -217,6 +219,7 @@ export class TaskRenderer {
     y: number,
     totalWidth: number,
     height: number,
+    COLORS: ReturnType<typeof getTaskColors>,
   ): void {
     const phases = getPhaseRanges(task);
     const taskDuration = task._endTime - task.startTime;
@@ -306,6 +309,7 @@ export class TaskRenderer {
     width: number,
     height: number,
     progress: number,
+    COLORS: ReturnType<typeof getTaskColors>,
   ): void {
     const progressHeight = 3;
     const progressY = y + height - progressHeight - 2;
@@ -346,6 +350,7 @@ export class TaskRenderer {
     y: number,
     width: number,
     height: number,
+    COLORS: ReturnType<typeof getTaskColors>,
   ): void {
     const padding = 6;
     const maxWidth = width - padding * 2;

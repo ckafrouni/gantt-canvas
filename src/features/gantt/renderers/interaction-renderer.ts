@@ -6,18 +6,7 @@ import {
   drawDashedLine,
 } from "../utils/canvas-utils";
 import { getIndexManager } from "../indexes/index-manager";
-
-/** Interaction rendering constants */
-const COLORS = {
-  dragPreview: "rgba(59, 130, 246, 0.5)", // blue-500 with opacity
-  dragPreviewBorder: "#3b82f6",
-  dropZoneValid: "rgba(34, 197, 94, 0.2)", // green-500 with opacity
-  dropZoneInvalid: "rgba(239, 68, 68, 0.2)", // red-500 with opacity
-  selectionBox: "rgba(59, 130, 246, 0.2)",
-  selectionBoxBorder: "#3b82f6",
-  snapLine: "#fbbf24", // amber-400
-  conflictHighlight: "rgba(239, 68, 68, 0.3)",
-};
+import { getInteractionColors } from "../utils/theme-colors";
 
 const TASK_HEIGHT_RATIO = 0.7;
 const TASK_BORDER_RADIUS = 4;
@@ -45,6 +34,7 @@ export class InteractionRenderer {
 
   /**
    * Render interaction elements
+   * @param minResolution - Minimum snap resolution in minutes (default: 30)
    */
   render(
     viewport: ViewportState,
@@ -56,20 +46,22 @@ export class InteractionRenderer {
       endY: number;
     } | null,
     tasks: Record<string, Task>,
+    minResolution = 30,
   ): void {
     if (!this.ctx) return;
 
     const ctx = this.ctx;
+    const COLORS = getInteractionColors();
     clearCanvas(ctx, this.width, this.height);
 
     // Render selection box
     if (selectionBox) {
-      this.renderSelectionBox(ctx, selectionBox);
+      this.renderSelectionBox(ctx, selectionBox, COLORS);
     }
 
     // Render drag preview
     if (dragState) {
-      this.renderDragPreview(ctx, dragState, viewport, tasks);
+      this.renderDragPreview(ctx, dragState, viewport, tasks, COLORS, minResolution);
     }
   }
 
@@ -79,6 +71,7 @@ export class InteractionRenderer {
   private renderSelectionBox(
     ctx: CanvasRenderingContext2D,
     box: { startX: number; startY: number; endX: number; endY: number },
+    COLORS: ReturnType<typeof getInteractionColors>,
   ): void {
     const x = Math.min(box.startX, box.endX);
     const y = Math.min(box.startY, box.endY);
@@ -105,6 +98,8 @@ export class InteractionRenderer {
     dragState: DragState,
     viewport: ViewportState,
     tasks: Record<string, Task>,
+    COLORS: ReturnType<typeof getInteractionColors>,
+    minResolution = 30,
   ): void {
     const indexManager = getIndexManager();
 
@@ -169,7 +164,7 @@ export class InteractionRenderer {
       dragState.type === "resize-start" ||
       dragState.type === "resize-end"
     ) {
-      this.renderSnapLines(ctx, dragState, viewport);
+      this.renderSnapLines(ctx, dragState, viewport, COLORS, minResolution);
     }
 
     // Render the task preview (ghost)
@@ -229,7 +224,14 @@ export class InteractionRenderer {
     }
 
     // Render time tooltip
-    this.renderTimeTooltip(ctx, dragState, previewX, taskY, previewWidth);
+    this.renderTimeTooltip(
+      ctx,
+      dragState,
+      previewX,
+      taskY,
+      previewWidth,
+      COLORS,
+    );
   }
 
   /**
@@ -239,9 +241,11 @@ export class InteractionRenderer {
     ctx: CanvasRenderingContext2D,
     dragState: DragState,
     viewport: ViewportState,
+    COLORS: ReturnType<typeof getInteractionColors>,
+    minResolution = 30,
   ): void {
-    // Get snap interval
-    const snapInterval = this.getSnapInterval(viewport.zoomLevel);
+    // Get snap interval (respects minResolution)
+    const snapInterval = this.getSnapInterval(viewport.zoomLevel, minResolution);
     const snappedStart =
       Math.round(dragState.previewStartTime / snapInterval) * snapInterval;
     const snappedEnd =
@@ -287,6 +291,7 @@ export class InteractionRenderer {
     taskX: number,
     taskY: number,
     taskWidth: number,
+    COLORS: ReturnType<typeof getInteractionColors>,
   ): void {
     const startDate = new Date(dragState.previewStartTime);
     const endDate = new Date(dragState.previewEndTime);
@@ -316,7 +321,7 @@ export class InteractionRenderer {
     finalX = Math.max(4, Math.min(this.width - tooltipWidth - 4, finalX));
 
     // Draw tooltip background
-    ctx.fillStyle = "#1e293b";
+    ctx.fillStyle = COLORS.tooltipBackground;
     fillRoundRect(
       ctx,
       finalX,
@@ -324,31 +329,34 @@ export class InteractionRenderer {
       tooltipWidth,
       tooltipHeight,
       4,
-      "#1e293b",
+      COLORS.tooltipBackground,
     );
 
     // Draw tooltip text
-    ctx.fillStyle = "#f8fafc";
+    ctx.fillStyle = COLORS.tooltipText;
     ctx.textBaseline = "middle";
     ctx.fillText(text, finalX + padding, tooltipY + tooltipHeight / 2);
   }
 
+  /** Zoom-based snap intervals in minutes */
+  private static readonly ZOOM_SNAP_INTERVALS: Record<string, number> = {
+    hour: 15,
+    day: 60,
+    week: 360, // 6 hours
+    month: 1440, // 24 hours
+  };
+
   /**
-   * Get snap interval in ms based on zoom level
+   * Get snap interval in ms based on zoom level and minimum resolution.
+   * The snap interval scales with zoom but never goes below minResolution.
+   * @param zoomLevel - Current zoom level
+   * @param minResolution - Minimum resolution in minutes (default: 30)
    */
-  private getSnapInterval(zoomLevel: string): number {
-    switch (zoomLevel) {
-      case "hour":
-        return 15 * 60 * 1000; // 15 minutes
-      case "day":
-        return 60 * 60 * 1000; // 1 hour
-      case "week":
-        return 6 * 60 * 60 * 1000; // 6 hours
-      case "month":
-        return 24 * 60 * 60 * 1000; // 1 day
-      default:
-        return 60 * 60 * 1000;
-    }
+  private getSnapInterval(zoomLevel: string, minResolution = 30): number {
+    const zoomSnapMinutes =
+      InteractionRenderer.ZOOM_SNAP_INTERVALS[zoomLevel] ?? 60;
+    const effectiveSnapMinutes = Math.max(zoomSnapMinutes, minResolution);
+    return effectiveSnapMinutes * 60 * 1000;
   }
 
   /**
